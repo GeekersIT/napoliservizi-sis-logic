@@ -4,21 +4,21 @@ const config = {
         username: process.env.ADMIN_USER,
         password: process.env.ADMIN_PWD,
         realm: process.env.KEYCLOAK_REALM,
-        secret: '5eb0a9d3-d6a4-474f-a155-29e3e2a42de2'
+        secret: process.env.KEYCLOAK_ADMIN_SECRET
     },
     db: {
-        url: "https://" + process.env.PUBLIC_URI + "/api/v1/graphql",
+        url: "hasura."+process.env.NAMESPACE+"/db/v1/graphql",
     },
     minio: {
-        url: process.env.MINIO_SERVICE,
+        url: "minio."+process.env.NAMESPACE,
         accessKey: process.env.MINIO_ACCESS,
         secretKey: process.env.MINIO_SECRET
     },
     template: {
-        url: "https://" + process.env.MINIO_ACCESS + "/template/"
+        url: "minio."+process.env.NAMESPACE + "/template/"
     },
     protocollo: {
-        url: "http://protocollo-service:8080"
+        url: "protocollo-service"+process.env.NAMESPACE + ":8080"
     }
 };
 
