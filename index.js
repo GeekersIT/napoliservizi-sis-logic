@@ -1675,6 +1675,10 @@ app.post("/ris/protocolla", async (req, res) => {
   }
 });
 
+app.get('/_health', (req, res) => {
+  res.send({'status': 'ok'}); // Simple health endpoint so kubernetes/other know that service is up and running
+});
+
 
 
 app.listen(port, () => {
