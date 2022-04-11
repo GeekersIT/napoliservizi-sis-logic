@@ -19,10 +19,11 @@ const kcAdminClient = new KcAdminClient.default({
 
 const minioClient = new Minio.Client({
   endPoint: config.minio.url,
+  useSSL: false,
+  port: 9000,
   accessKey: config.minio.accessKey,
   secretKey: config.minio.secretKey
 });
-
 
 app.use(bodyParser.json({ limit: '500mb' }));
 app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
@@ -85,7 +86,8 @@ app.post("/unita/operativa/aggiungi", async (req, res) => {
       {
         name: data.new.id,
         attributes: {
-          nome: [data.new.nome]
+          nome: [data.new.nome],
+          gruppo_unita_operativa: [data.new.id]
         }
       },
     );
@@ -856,9 +858,13 @@ app.post("/ris/protocolla", async (req, res) => {
             numero
             mittente {
               id
-              nome
-              sigla
               codice
+              settore
+              servizio
+              uoc
+              uos
+              postazione
+              nome
             }
             id
             destinatari {
@@ -866,9 +872,13 @@ app.post("/ris/protocolla", async (req, res) => {
               e_esterno
               destinatario_interno {
                 id
-                nome
                 codice
-                sigla
+                settore
+                servizio
+                uoc
+                uos
+                postazione
+                nome
               }
               destinatario_esterno {
                 id
@@ -1650,7 +1660,7 @@ app.post("/ris/protocolla", async (req, res) => {
     const template = await fetch(
       config.template.url + '/ris.docx'
     ).then((v) => v.arrayBuffer());
-    const ris = response.ris[0];
+    const ris = response.sis_ris[0];
     const report = await createReport.default({
       template: template,
       data: ris,
@@ -1658,7 +1668,7 @@ app.post("/ris/protocolla", async (req, res) => {
     });
     var pdfBuffer = await toPdf(report)
     var file = new Buffer.from(pdfBuffer);
-    var filename = ris.protocollo.numero + ".pdf";
+    var filename = ris.protocollo.numero.replace(/\//g, '_') + ".pdf";
     minioClient.putObject('ris-' + data.new.id, filename, file, {
       'Content-Type': 'application/pdf',
     }, function (err, objInfo) {
